@@ -1,0 +1,7 @@
+DeviceUseDaily <- DailyActivityClean %>%
+  distinct(Id, TotalHours)
+
+DeviceUseDaily2 <- DailyActivityClean %>%
+  group_by(Id) %>%
+  summarise(HD = mean(TotalHours)
+  

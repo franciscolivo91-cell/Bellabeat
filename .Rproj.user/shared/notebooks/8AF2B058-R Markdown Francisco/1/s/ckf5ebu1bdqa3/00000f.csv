@@ -1,0 +1,4 @@
+"0","Weight$DateTime <- mdy_hms(Weight$Date)"
+"0","Weight$Date <- as.Date(Weight$DateTime)"
+"0","Weight$Time <- format(Weight$DateTime, ""%H:%M:%S"")"
+"0",""

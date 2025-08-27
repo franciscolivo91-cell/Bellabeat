@@ -1,0 +1,2 @@
+"0","DailyActivityClean <- DailyActivity %>%"
+"0","  filter(!(TotalSteps == ""0"" & `TotalDistance[km]`==""0"" & `TrackerDistance[km]`==""0"" & `LoggedActivitiesDistance[km]` ==""0"" & `VeryActiveDistance[km]`==""0"" & `ModeratelyActiveDistance[km]`==""0"" & `LightActiveDistance[km]`==""0"" & `SedentaryActiveDistance[km]`==""0"" & VeryActiveMinutes==""0"" & FairlyActiveMinutes==""0"" & LightlyActiveMinutes==""0""))"

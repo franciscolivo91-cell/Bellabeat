@@ -1,0 +1,623 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={BellaBeat case},
+  pdfauthor={Francisco Olivo},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{BellaBeat case}
+\author{Francisco Olivo}
+\date{2025-08-06}
+
+\begin{document}
+\maketitle
+
+\subsubsection{Summary}\label{summary}
+
+Bellabeat is a high-tech manufacturer of health-focused products for
+women. Collecting data on activity, sleep, stress, and reproductive
+health has allowed Bellabeat to empower women with knowledge about their
+own health and habits. Since it was founded in 2013, Bellabeat has grown
+rapidly and quickly positioned itself as a tech-driven wellness company
+for women.
+
+\subsubsection{Identifying the business
+task:}\label{identifying-the-business-task}
+
+Bellabeat wants me to analyze other smart tracking devices data, get
+insights, and uncover growth opportunities in the smart wellness device
+industry, focusing in a single product in order to help to decide the
+marketing strategy for the company.
+
+\subsubsection{About the data}\label{about-the-data}
+
+A specific public dataset was pointed:
+\href{https://www.kaggle.com/datasets/arashnic/fitbit}{FitBit Fitness
+Tracker Data} (CC0: Public Domain) This Kaggle data set contains
+personal fitness tracker from 30 fitbit users.
+
+\subsubsection{First encounter}\label{first-encounter}
+
+Given the size, the first approach was to open the .csv files with
+\textbf{GoogleSheets} and get to know the data. The
+``dailyActivity\_merged'' document consolidates many of the other
+documents, taking days as a timing base.
+
+The interesting ones to work with will be ``dailyActivity,
+weightLogInfo, and sleepDay''
+
+Findings:
+
+\begin{itemize}
+\tightlist
+\item
+  The data set contains information of 35 unique IDs over the course of
+  62 days.
+\item
+  The Data Set informs that 30 people gave permission to share their
+  data, but 35 IDs where found. This inconsistency affects the
+  reliability of the data and warns about possible collection of data
+  without authorization.
+\item
+  The sample size is small to consider it a representation of the
+  population.
+\item
+  The data does not have demographic information like age, or sex, which
+  could bring sampling bias. Furthermore, the sex is a crucial
+  characteristic for this study.
+\item
+  The data is from 2016, so it is not current information.
+\end{itemize}
+
+As a complement to the dataset, a
+\href{https://www.fitabase.com/media/1930/fitabasedatadictionary102320.pdf}{Data
+Dictionary.pdf} document for a similar tracker device was found, and it
+played a big role interpreting the dimension of each datatype.
+
+\subsubsection{Manipulation}\label{manipulation}
+
+With two set of files for different time periods, it was decided to
+combine the two dailyActivity documents The name of the columns
+describing distances was changed to add ``{[}km{]}'', and Calories was
+changed for ``Calories {[}kcal{]}'', keeping the dimensions on sight.
+
+The weightLogInfo were also combined into a single document using
+\textbf{Google Sheets}. The ``date'' column has both date and time, it
+is convenient to have it separated
+
+\paragraph{Loading .csv}\label{loading-.csv}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{options}\NormalTok{(}\AttributeTok{repos =} \FunctionTok{c}\NormalTok{(}\AttributeTok{CRAN =} \StringTok{"https://cloud.r{-}project.org"}\NormalTok{))}
+\FunctionTok{install.packages}\NormalTok{(}\StringTok{"tidyverse"}\NormalTok{)}
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+\FunctionTok{library}\NormalTok{(lubridate)}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(scales)}
+\NormalTok{DailyActivity }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"dailyActivity\_combined.csv"}\NormalTok{)}
+\NormalTok{Weight }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"weightLogInfo\_combined.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+An issue with the spaces in the columns names was found. To eliminate
+them:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{names}\NormalTok{(DailyActivity) }\OtherTok{\textless{}{-}} \FunctionTok{gsub}\NormalTok{(}\StringTok{" "}\NormalTok{, }\StringTok{""}\NormalTok{, }\FunctionTok{names}\NormalTok{(DailyActivity))}
+\end{Highlighting}
+\end{Shaded}
+
+Now to separate the date and the time in the Weight dataframe:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Weight}\SpecialCharTok{$}\NormalTok{DateTime }\OtherTok{\textless{}{-}} \FunctionTok{as.POSIXct}\NormalTok{(Weight}\SpecialCharTok{$}\NormalTok{Date, }\AttributeTok{format =} \StringTok{"\%m/\%d/\%Y \%I:\%M:\%S \%p"}\NormalTok{)}
+\NormalTok{Weight}\SpecialCharTok{$}\NormalTok{Date }\OtherTok{\textless{}{-}} \FunctionTok{as.Date}\NormalTok{(Weight}\SpecialCharTok{$}\NormalTok{DateTime)}
+\NormalTok{Weight}\SpecialCharTok{$}\NormalTok{Time  }\OtherTok{\textless{}{-}} \FunctionTok{format}\NormalTok{(Weight}\SpecialCharTok{$}\NormalTok{DateTime, }\AttributeTok{format =} \StringTok{"\%H:\%M:\%S"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+The sleepDay document only contains information for the second half of
+the period of study. It will be beneficial to use the data from the
+minuteSleep documents, and translate it to daily basis to get the entire
+picture.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{MinuteSleep1 }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"minuteSleep\_merged\_01.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Rows: 198559 Columns: 4
+## -- Column specification --------------------------------------------------------
+## Delimiter: ","
+## chr (1): date
+## dbl (3): Id, value, logId
+## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{MinuteSleep2 }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"minuteSleep\_merged.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Rows: 188521 Columns: 4
+## -- Column specification --------------------------------------------------------
+## Delimiter: ","
+## chr (1): date
+## dbl (3): Id, value, logId
+## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{MinuteSleep }\OtherTok{\textless{}{-}} \FunctionTok{rbind}\NormalTok{(MinuteSleep1, MinuteSleep2)}
+\end{Highlighting}
+\end{Shaded}
+
+Reformatting the Date and time:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{MinuteSleep}\SpecialCharTok{$}\NormalTok{DateTime }\OtherTok{\textless{}{-}} \FunctionTok{as.POSIXct}\NormalTok{(MinuteSleep}\SpecialCharTok{$}\NormalTok{date, }\AttributeTok{format =} \StringTok{"\%m/\%d/\%Y \%I:\%M:\%S \%p"}\NormalTok{)}
+\NormalTok{MinuteSleep}\SpecialCharTok{$}\NormalTok{Time }\OtherTok{\textless{}{-}} \FunctionTok{format}\NormalTok{(MinuteSleep}\SpecialCharTok{$}\NormalTok{DateTime, }\AttributeTok{format =} \StringTok{"\%H:\%M:\%S"}\NormalTok{)}
+\NormalTok{MinuteSleep}\SpecialCharTok{$}\NormalTok{Date }\OtherTok{\textless{}{-}} \FunctionTok{as.Date}\NormalTok{(MinuteSleep}\SpecialCharTok{$}\NormalTok{DateTime)}
+\NormalTok{MinuteSleep}\SpecialCharTok{$}\NormalTok{date }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+Now, re configuring the data to have the same format as the given
+sleepDay document
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DailySleep }\OtherTok{\textless{}{-}}\NormalTok{ MinuteSleep }\SpecialCharTok{\%\textgreater{}\%}
+\FunctionTok{group\_by}\NormalTok{(Id, Date) }\SpecialCharTok{\%\textgreater{}\%}
+\FunctionTok{summarise}\NormalTok{(}
+  \AttributeTok{TotalSleepRecords =} \FunctionTok{n\_distinct}\NormalTok{(logId),}
+  \AttributeTok{TotalMinutesAsleep =} \FunctionTok{sum}\NormalTok{(value }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{)),}
+  \AttributeTok{TotalMinutesInBed =} \FunctionTok{sum}\NormalTok{(value }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{)),}
+  \AttributeTok{.groups =} \StringTok{"drop"}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+Loading the given document, and comparing a sample of the two data
+frames in the same period o time to check consistency
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{SleepDay }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"sleepDay\_merged.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Rows: 413 Columns: 5
+## -- Column specification --------------------------------------------------------
+## Delimiter: ","
+## chr (1): SleepDay
+## dbl (4): Id, TotalSleepRecords, TotalMinutesAsleep, TotalTimeInBed
+## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{filter}\NormalTok{(DailySleep, Id }\SpecialCharTok{==} \DecValTok{1503960366}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 5
+##           Id Date   TotalSleepRecords TotalMinutesAsleep TotalMinutesInBed
+##        <dbl> <date>             <int>              <int>             <int>
+## 1 1503960366 NA                    55              17909             19209
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{filter}\NormalTok{(DailySleep, Id }\SpecialCharTok{==} \DecValTok{1503960366}\NormalTok{, Date }\SpecialCharTok{\textgreater{}} \DecValTok{2016{-}04{-}16}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 0 x 5
+## # i 5 variables: Id <dbl>, Date <date>, TotalSleepRecords <int>,
+## #   TotalMinutesAsleep <int>, TotalMinutesInBed <int>
+\end{verbatim}
+
+The generated DailySleep is consistent with the given SleepDay.
+
+Now looking for duplicates entries:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{duplicated}\NormalTok{(DailyActivity))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{duplicated}\NormalTok{(DailySleep))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{duplicated}\NormalTok{(Weight))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 2
+\end{verbatim}
+
+The data frame ``Weight'' has duplicates. Revising the actual duplicates
+to understand their nature
+
+\begin{verbatim}
+## # A tibble: 4 x 10
+##           Id Date   WeightKg WeightPounds   Fat   BMI IsManualReport       LogId
+##        <dbl> <date>    <dbl>        <dbl> <dbl> <dbl> <lgl>                <dbl>
+## 1 6962181067 NA         62.5         138.    NA  24.4 TRUE               1.46e12
+## 2 8877689391 NA         85.8         189.    NA  25.7 FALSE              1.46e12
+## 3 6962181067 NA         62.5         138.    NA  24.4 TRUE               1.46e12
+## 4 8877689391 NA         85.8         189.    NA  25.7 FALSE              1.46e12
+## # i 2 more variables: DateTime <dttm>, Time <chr>
+\end{verbatim}
+
+It was found that in both cases, one of the entries was manual and the
+other was automatic. Now cleaning those:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{WeightClean }\OtherTok{\textless{}{-}}\NormalTok{ Weight[}\SpecialCharTok{!}\FunctionTok{duplicated}\NormalTok{(Weight),]}
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{duplicated}\NormalTok{(WeightClean))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+An additional column is added to have the total time in Hours: \#Esto lo
+uso??
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DailyActivity }\OtherTok{\textless{}{-}}\NormalTok{ DailyActivity }\SpecialCharTok{\%\textgreater{}\%}
+\FunctionTok{mutate}\NormalTok{(}\AttributeTok{TotalHours =}\NormalTok{ Totaltime }\SpecialCharTok{/} \DecValTok{60}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+It was found that the DailyActivity dataframe has many rows where the
+majority of the elements are zero, with no record of movement or
+distance, it could mean that the tracking device was not being worn, but
+it was still counting the time as SedentaryMinutes, adding to TotalTime,
+and generating a number is Calories. This information is contradictory.
+A new dataframe is created without these elements
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DailyActivityClean }\OtherTok{\textless{}{-}}\NormalTok{ DailyActivity }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\NormalTok{(TotalSteps }\SpecialCharTok{==} \StringTok{"0"} \SpecialCharTok{\&} \StringTok{\textasciigrave{}}\AttributeTok{TotalDistance[km]}\StringTok{\textasciigrave{}}\SpecialCharTok{==}\StringTok{"0"} \SpecialCharTok{\&} \StringTok{\textasciigrave{}}\AttributeTok{TrackerDistance[km]}\StringTok{\textasciigrave{}}\SpecialCharTok{==}\StringTok{"0"} \SpecialCharTok{\&} \StringTok{\textasciigrave{}}\AttributeTok{LoggedActivitiesDistance[km]}\StringTok{\textasciigrave{}} \SpecialCharTok{==}\StringTok{"0"} \SpecialCharTok{\&} \StringTok{\textasciigrave{}}\AttributeTok{VeryActiveDistance[km]}\StringTok{\textasciigrave{}}\SpecialCharTok{==}\StringTok{"0"} \SpecialCharTok{\&} \StringTok{\textasciigrave{}}\AttributeTok{ModeratelyActiveDistance[km]}\StringTok{\textasciigrave{}}\SpecialCharTok{==}\StringTok{"0"} \SpecialCharTok{\&} \StringTok{\textasciigrave{}}\AttributeTok{LightActiveDistance[km]}\StringTok{\textasciigrave{}}\SpecialCharTok{==}\StringTok{"0"} \SpecialCharTok{\&} \StringTok{\textasciigrave{}}\AttributeTok{SedentaryActiveDistance[km]}\StringTok{\textasciigrave{}}\SpecialCharTok{==}\StringTok{"0"} \SpecialCharTok{\&}\NormalTok{ VeryActiveMinutes}\SpecialCharTok{==}\StringTok{"0"} \SpecialCharTok{\&}\NormalTok{ FairlyActiveMinutes}\SpecialCharTok{==}\StringTok{"0"} \SpecialCharTok{\&}\NormalTok{ LightlyActiveMinutes}\SpecialCharTok{==}\StringTok{"0"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+After this, it is important to understand how much of the register was
+invalid. The percentage of information that was cleaned was:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{percent}\NormalTok{(}\DecValTok{1} \SpecialCharTok{{-}} \FunctionTok{nrow}\NormalTok{(DailyActivityClean) }\SpecialCharTok{/} \FunctionTok{nrow}\NormalTok{(DailyActivity),}\AttributeTok{accuracy =} \FloatTok{0.01}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "9.59%"
+\end{verbatim}
+
+\subsubsection{Analysing the Data}\label{analysing-the-data}
+
+The amount of steps is classified according to a publication in
+\href{https://www.nationalgeographicla.com/ciencia/2024/02/caminar-es-bueno-para-la-salud-cuantos-pasos-debe-dar-una-persona-al-dia}{NationalGeographic}
+as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  Sedentary: less than 5000 steps a day.
+\item
+  Lightly active: Between 5000 and 7499 steps a day.
+\item
+  Moderately active: Between 7500 and 9999 steps a day.
+\item
+  Active: Between 10000 and 12499 steps a day
+\item
+  Extremely active - More than 12500 steps a day.
+\end{itemize}
+
+Lets classify the dataframe according to the average steps taken
+everyday for each participant:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{AverageSteps }\OtherTok{\textless{}{-}}\NormalTok{ DailyActivityClean }\SpecialCharTok{\%\textgreater{}\%}
+     \FunctionTok{group\_by}\NormalTok{(Id) }\SpecialCharTok{\%\textgreater{}\%}
+     \FunctionTok{summarise}\NormalTok{(}\AttributeTok{AverageSteps =} \FunctionTok{mean}\NormalTok{(TotalSteps))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{AverageSteps }\OtherTok{\textless{}{-}}\NormalTok{ AverageSteps }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}
+  \AttributeTok{Category =} \FunctionTok{case\_when}\NormalTok{(}
+\NormalTok{             AverageSteps }\SpecialCharTok{\textless{}} \DecValTok{5000} \SpecialCharTok{\textasciitilde{}} \StringTok{"Sedentary"}\NormalTok{,}
+\NormalTok{             AverageSteps }\SpecialCharTok{\textless{}} \DecValTok{7500} \SpecialCharTok{\textasciitilde{}} \StringTok{"Lightly active"}\NormalTok{,}
+\NormalTok{             AverageSteps }\SpecialCharTok{\textless{}} \DecValTok{10000} \SpecialCharTok{\textasciitilde{}} \StringTok{"Moderately active"}\NormalTok{,}
+\NormalTok{             AverageSteps }\SpecialCharTok{\textless{}} \DecValTok{12500} \SpecialCharTok{\textasciitilde{}} \StringTok{"Active"}\NormalTok{,}
+             \ConstantTok{TRUE} \SpecialCharTok{\textasciitilde{}} \StringTok{"Extremely active"}
+\NormalTok{         )}
+\NormalTok{     )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## i Please use `linewidth` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+## generated.
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 5 rows containing missing values or values outside the scale range
+## (`geom_line()`).
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 5 rows containing missing values or values outside the scale range
+## (`geom_point()`).
+\end{verbatim}
+
+\pandocbounded{\includegraphics[keepaspectratio]{R-Markdown-Francisco_files/figure-latex/unnamed-chunk-18-1.pdf}}
+
+\#\#\#\#\pandocbounded{\includegraphics[keepaspectratio]{}}
+
+\subsubsection{About the weight
+information:}\label{about-the-weight-information}
+
+According to the
+\href{https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html}{U.S.
+Centers for Disease Control and Prevention}, there are 4 major
+categories for BMI in adults:
+
+\begin{itemize}
+\tightlist
+\item
+  Less than 18.5 -\textgreater{} Underweight
+\item
+  18.5 to less than 25 -\textgreater{} Healthy Weight
+\item
+  25 to less than 30 -\textgreater{} Overweight
+\item
+  30 or greater -\textgreater{} Obesity
+\end{itemize}
+
+Applied to our case, the distribution is:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{n\_distinct}\NormalTok{(WeightClean}\SpecialCharTok{$}\NormalTok{Id)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 13
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{AverageBMI }\OtherTok{\textless{}{-}}\NormalTok{ WeightClean }\SpecialCharTok{\%\textgreater{}\%} 
+     \FunctionTok{group\_by}\NormalTok{(Id) }\SpecialCharTok{\%\textgreater{}\%}
+     \FunctionTok{summarise}\NormalTok{(}\AttributeTok{AverageBMI =} \FunctionTok{mean}\NormalTok{(BMI))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{AverageBMI }\OtherTok{\textless{}{-}}\NormalTok{ AverageBMI }\SpecialCharTok{\%\textgreater{}\%}
+     \FunctionTok{mutate}\NormalTok{(}
+         \AttributeTok{Category =} \FunctionTok{case\_when}\NormalTok{(}
+\NormalTok{             AverageBMI }\SpecialCharTok{\textless{}} \FloatTok{18.5} \SpecialCharTok{\textasciitilde{}} \StringTok{"Underweight"}\NormalTok{,}
+\NormalTok{             AverageBMI }\SpecialCharTok{\textless{}} \DecValTok{25} \SpecialCharTok{\textasciitilde{}} \StringTok{"Healthy weight"}\NormalTok{,}
+\NormalTok{             AverageBMI }\SpecialCharTok{\textless{}} \DecValTok{30} \SpecialCharTok{\textasciitilde{}} \StringTok{"Overweight"}\NormalTok{,}
+             \ConstantTok{TRUE} \SpecialCharTok{\textasciitilde{}} \StringTok{"Obesity"}
+\NormalTok{          )}
+\NormalTok{      )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{PieChartBMI }\OtherTok{\textless{}{-}}\NormalTok{ AverageBMI }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{group\_by}\NormalTok{(Category) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{summarise}\NormalTok{(}\AttributeTok{Id =} \FunctionTok{n}\NormalTok{()) }\SpecialCharTok{\%\textgreater{}\%}
+    \FunctionTok{mutate}\NormalTok{(}\AttributeTok{Percentage =}\NormalTok{ Id }\SpecialCharTok{/} \FunctionTok{sum}\NormalTok{(Id))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(PieChartBMI, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \StringTok{""}\NormalTok{, }\AttributeTok{y =}\NormalTok{ Percentage, }\AttributeTok{fill =}\NormalTok{ Category)) }\SpecialCharTok{+}
+    \FunctionTok{geom\_bar}\NormalTok{(}\AttributeTok{stat =} \StringTok{"identity"}\NormalTok{, }\AttributeTok{width =} \DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{coord\_polar}\NormalTok{(}\StringTok{"y"}\NormalTok{, }\AttributeTok{start =} \DecValTok{0}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{geom\_text}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{label =} \FunctionTok{percent}\NormalTok{(Percentage)),}
+              \AttributeTok{position =} \FunctionTok{position\_stack}\NormalTok{(}\AttributeTok{vjust =} \FloatTok{0.5}\NormalTok{), }\AttributeTok{size =} \DecValTok{4}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Participants for BMI"}\NormalTok{) }\SpecialCharTok{+}
+    \FunctionTok{theme\_void}\NormalTok{() }\SpecialCharTok{+}
+    \FunctionTok{scale\_fill\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Blues"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\pandocbounded{\includegraphics[keepaspectratio]{R-Markdown-Francisco_files/figure-latex/unnamed-chunk-23-1.pdf}}
+
+Device Use
+
+How is the tracking devide used?
+
+How does this compare to the distribution of time?
+
+For how long is a tracking device used?
+
+According to the Sleep Foundation in the article
+\href{https://www.sleepfoundation.org/how-sleep-works/how-much-sleep-do-we-really-need}{How
+Much Sleep Do You Need?}, an adult need at least 7 hours of sleep.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DailySleep }\OtherTok{\textless{}{-}}\NormalTok{ DailySleep }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{RestPercent =}\NormalTok{ TotalMinutesAsleep}\SpecialCharTok{/}\NormalTok{TotalMinutesInBed}\SpecialCharTok{*}\DecValTok{100}\NormalTok{)}
+
+
+\NormalTok{SleepPerId }\OtherTok{\textless{}{-}}\NormalTok{ DailySleep }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{group\_by}\NormalTok{(Id) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{summarise}\NormalTok{(}\AttributeTok{Quality =} \FunctionTok{mean}\NormalTok{(RestPercent), }\AttributeTok{Quantity =} \FunctionTok{mean}\NormalTok{(TotalMinutesAsleep)}\SpecialCharTok{/}\DecValTok{60}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(Quality))}
+\end{Highlighting}
+\end{Shaded}
+
+Is there a relationship between the Sleepig hours and
+
+Se usa 24 horas? Peso de la muestra
+
+Desviación máxima de la medida Dias de la semana Numero de pasos por ID
+por dia de la semana
+
+Esto por aqui, pero no se ggplot(MeetWHOId, aes(x =
+reorder(as.factor(Id), -MetWeeks), y = MetWeeks)) + + geom\_bar(stat =
+``identity'', fill = ``seagreen'') + + labs( + title = ``Weeks that meet
+the WHO recommendation'', + x = ``Participant´s ID'', + y = ``Met
+Weeks'' + ) + + theme\_minimal()
+
+\end{document}

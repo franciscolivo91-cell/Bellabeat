@@ -1,0 +1,3 @@
+"0","AverageBMI <- WeightClean %>% "
+"0","     group_by(Id) %>%"
+"0","     summarise(AverageBMI = mean(BMI))"

@@ -1,0 +1,8 @@
+"0","DailySleep <- MinuteSleep %>%"
+"0","group_by(Id, Date) %>%"
+"0","summarise("
+"0","  TotalSleepRecords = n_distinct(logId),"
+"0","  TotalMinutesAsleep = sum(value %in% c(1)),"
+"0","  TotalMinutesInBed = sum(value %in% c(1, 2, 3)),"
+"0","  .groups = ""drop"""
+"0","  )"

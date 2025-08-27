@@ -1,0 +1,580 @@
+---
+title: "BellaBeat case"
+author: "Francisco Olivo"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1. Summary
+
+Bellabeat is a high-tech manufacturer of health-focused products for women. Collecting data on activity, sleep, stress, and reproductive health has allowed Bellabeat to empower women with knowledge about their own health and habits. Since it was founded in 2013, Bellabeat has grown rapidly and quickly positioned itself as a tech-driven wellness company for women.
+
+### 2. Identifying the business task:
+
+Bellabeat wants me to analyze other smart tracking devices data, get insights, and uncover growth opportunities in the smart wellness device industry, focusing in a single product in order to help to decide the marketing strategy for the company.
+
+
+### 3. About the data 
+
+A specific public dataset was pointed: [FitBit Fitness Tracker Data](https://www.kaggle.com/datasets/arashnic/fitbit) (CC0: Public Domain) This Kaggle data set contains personal fitness tracker from 30 fitbit users.
+
+
+As a complement to the dataset, a [Data Dictionary.pdf](https://www.fitabase.com/media/1930/fitabasedatadictionary102320.pdf) document for a similar tracker device was found, and it played a big role interpreting the dimension of each datatype.
+
+<br>
+
+#### 3.1 First encounter:
+
+Given the size, the first approach was to open the .csv files with **GoogleSheets** and get to know the data. 
+The "dailyActivity_merged" document consolidates many of the other documents, taking days as a timing base.
+
+The interesting ones to work with will be:
+
+* 1) dailyActivity 
+* 2) weightLogInfo
+* 3) sleepDay
+
+<br>
+
+#### 3.2 Findings:
+
+* The dataset contains information of 35 unique IDs over the course of 62 days.
+* The dataset informs that 30 people gave permission to share their data, but 35 IDs where found. This inconsistency affects the reliability of the data and warns about possible collection of data without authorization.
+* The data does not have demographic information like age, or sex, which could bring sampling bias. Furthermore, the sex is a crucial characteristic for this study.
+* The data is from 2016, so it is not current information.
+* The sample size is small to consider it a representation of the population.
+
+<br>
+
+#### 3.3 About the sample size:
+
+To understand how representative it is, lets take the equation to calculate it
+
+$$
+\text{Sample size:} \quad 
+n = \frac{N \, Z^2 \, p \, q}{E^2 \,(N - 1) + Z^2 \, p \, q}
+$$
+and We can re-arrange as follows to calculate the population that sample represents:
+
+$$
+\text{Population size:} \quad 
+N = \frac{n \left(E^{2} - Z^{2}pq \right)}{nE^{2} - Z^{2}pq}
+$$
+Knowing that:
+
+* N = Population Size 
+* n = Sample size 
+* Z = critical value according to the confidence level (1.96 for 95% confidence)
+* p = expected proportion of success (if unknown, 0.5 is used for the most conservative case) 
+* q = 1- p
+* E = tolerated margin of error (5% in decimal)
+
+```{r}
+n <- 30
+Z <- 1.96
+p <- 0.5
+q <- 1 - p
+E <- 0.05
+N <- n*(E*E-Z*Z*p*q)/(n*E*E-Z*Z*p*q)
+print(paste("Population size: N =",round(N)))
+```
+The sample of n = 30, with 95% of confidence (Z = 1.96), p = 0.5, and an error of 5%, represents a population of 32 people.
+
+<br>
+
+How far is this sample from being representative?
+Lets check that equation as a function for different levels of error:
+
+```{r}
+n <- 30
+Z <- 1.96
+p <- 0.5
+q <- 1 - p
+
+# List of errors values to test
+ErrorValues <- c(0.05, 0.07, 0.09, 0.11, 0.13, 0.15)
+
+# Population equation
+NFunction <- function(E, n, Z, p, q){
+  n * (E^2 - Z^2 * p * q) / (n * E^2 - Z^2 * p * q)
+}
+
+# Population for each error
+PopulationForError <- sapply(ErrorValues, NFunction, n=n, Z=Z, p=p, q=q)
+
+
+PopulationDF <- data.frame(
+  `Error Margin (%)` = round(ErrorValues * 100, 1),
+  `Total population (N)` = round(PopulationForError, 1),
+  check.names = FALSE
+)
+
+print(PopulationDF, row.names = FALSE)
+```
+To keep in perspective how significant this sample is: Even with a 15% error margin, the population is not even 100 people.
+
+<br>
+
+#### 3.4 Moving on to the documents:
+
+With two set of files for different time periods, it was decided to combine the two dailyActivity documents.
+
+The name of the columns describing distances was changed to add "[km]", and Calories was changed for "Calories [kcal]", keeping the dimensions on sight.
+
+The weightLogInfo were also combined into a single document using **Google Sheets**. 
+
+The "date" column has both date and time, it is convenient to have it separated
+
+<br>
+
+#### 3.5 Installing packages and Loading .csv 
+
+```{r echo=TRUE, results='hide', message=FALSE, warning=FALSE}
+options(repos = c(CRAN = "https://cloud.r-project.org"))  #To download packages from
+install.packages("tidyverse")
+install.packages("plotly")
+library(tidyverse)
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+library(scales)
+library(plotly)
+
+DailyActivity <- read_csv("dailyActivity_combined.csv")
+Weight <- read_csv("weightLogInfo_combined.csv")
+SleepDay <- read_csv("sleepDay_merged.csv")
+```
+
+1) DailyActivity: An issue with the spaces in the columns names was found. To eliminate them:
+
+```{r DailyActivity}
+names(DailyActivity) <- gsub(" ", "", names(DailyActivity))
+```
+
+2) Weight: Now to separate the date and the time in the dataframe:
+
+```{r results='hide'}
+Weight$DateTime <- mdy_hms(Weight$Date)
+Weight$Date <- as.Date(Weight$DateTime)
+Weight$Time <- format(Weight$DateTime, "%H:%M:%S")
+
+```
+  
+3) SleepDay: The dataframe only contains information from the second half of the period of study. It would be beneficial to use the data from the minuteSleep documents, and translate it to daily basis to get the entire picture. 
+
+```{r message=FALSE, warning=FALSE, results='hide'}
+MinuteSleep1 <- read_csv("minuteSleep_merged_01.csv")
+MinuteSleep2 <- read_csv("minuteSleep_merged.csv")
+MinuteSleep <- rbind(MinuteSleep1, MinuteSleep2)
+```
+
+Reformatting the Date and time:
+
+```{r results='hide'}
+
+MinuteSleep$DateTime <- mdy_hms(MinuteSleep$date)
+MinuteSleep$Date <- as.Date(MinuteSleep$DateTime)
+MinuteSleep$Time <- format(MinuteSleep$DateTime, "%H:%M:%S")
+MinuteSleep$date <- NULL
+
+```
+
+Now, re configuring the data to have the same format as the given sleepDay document
+
+```{r results='hide'}
+DailySleep <- MinuteSleep %>%
+group_by(Id, Date) %>%
+summarise(
+  TotalSleepRecords = n_distinct(logId),
+  TotalMinutesAsleep = sum(value %in% c(1)),
+  TotalMinutesInBed = sum(value %in% c(1, 2, 3)),
+  .groups = "drop"
+  )
+```
+
+Comparing the given "SleepDay" document against the generated by me from the dataframe in minutes called "DailySleep", by taking a sample of the two dataframes in the same period of time, and check for consistency
+
+I selected a single Id as a sample, (the first one = 1503960366) and checked the first 10 days using:
+
+```{r}
+print(filter(DailySleep, Id == 1503960366, Date > as.Date("2016-04-11")))
+print(filter(SleepDay, Id == 1503960366))
+```
+
+The generated DailySleep and the given SleepDay are not 100% consistent. 
+
+This information needs to be double checked. 
+Using **Google Sheets** -and no code- I filtered the same conditions in both dataframes, and finally used PivotTables to compare against the information taken from the file in minutes:
+
+**Given sleepDay_merged sample**
+![](sleepDay_merged.PNG)
+
+<br>
+
+**Given minutesSleep_merged sample**
+![](minuteSleep_merged.PNG)
+
+<br>
+
+**Own generated DailySleep sample**
+![](DailySleep.PNG)
+
+<br>
+
+From this code-free sample comparison, I can determine that my code gives consistent result with the information from the file given in minutes.
+None the less, the information provided in minutes, and the one provided in days, are NOT CONSISTENT. 
+With this information, I decided that the sleepDay_merged document will not be used. Furthermore, it raises another alarm about the integrity of the provided data.
+
+
+### 4. Cleaning
+
+Looking for duplicates entries:
+
+```{r}
+sum(duplicated(DailyActivity))
+sum(duplicated(DailySleep))
+sum(duplicated(Weight))
+```
+Weight: The data frame has duplicates. Revising the actual duplicates to understand their nature
+
+  ```{r}
+  Weight[duplicated(Weight) | duplicated(Weight, fromLast=TRUE), ]
+  ```
+
+
+It was found that in both cases, one of the entries was manual and the other was automatic. Now cleaning those:
+
+
+```{r}
+WeightClean <- Weight[!duplicated(Weight),]
+sum(duplicated(WeightClean))
+```
+
+DailyActivity: It was found that this dataframe has many rows where the majority of the elements are zero, with no record of movement or distance, it could mean that the tracking device was not being worn, but it was still counting the time as SedentaryMinutes, adding to TotalTime, and generating a number is Calories. This information is contradictory. A new dataframe is created without these elements 
+
+```{r}
+# Cleaning all zero rows
+DailyActivityClean <- DailyActivity %>%
+  filter(!(TotalSteps == "0" & `TotalDistance[km]`=="0" & `TrackerDistance[km]`=="0" & `LoggedActivitiesDistance[km]` =="0" & `VeryActiveDistance[km]`=="0" & `ModeratelyActiveDistance[km]`=="0" & `LightActiveDistance[km]`=="0" & `SedentaryActiveDistance[km]`=="0" & VeryActiveMinutes=="0" & FairlyActiveMinutes=="0" & LightlyActiveMinutes=="0"))
+```
+
+After this, it is important to understand how much of the register was invalid. 
+The percentage of information that was cleaned, and the number of Ids on the dataframe are:
+
+```{r}
+percent(1 - nrow(DailyActivityClean) / nrow(DailyActivity),accuracy = 0.01)
+n_distinct(DailyActivityClean$Id)
+```
+
+### 5. Analysing the Data
+<br>
+
+#### 5.1 DailyActivity infomration:
+
+The amount of steps is classified according to a publication in [NationalGeographic](https://www.nationalgeographicla.com/ciencia/2024/02/caminar-es-bueno-para-la-salud-cuantos-pasos-debe-dar-una-persona-al-dia) as follows:
+
+* Sedentary: less than 5000 steps a day.
+* Lightly active: Between 5000 and 7499 steps a day.
+* Moderately active: Between 7500 and 9999 steps a day.
+* Active: Between 10000 and 12499 steps a day
+* Extremely active - More than 12500 steps a day.
+
+
+Lets classify the dataframe according to the average steps taken everyday for each participant:
+
+```{r}
+#Average steps per Id
+AverageSteps <- DailyActivityClean %>%
+     group_by(Id) %>%
+     summarise(AverageSteps = mean(TotalSteps))
+```
+
+```{r}
+#Adding Categories
+AverageSteps <- AverageSteps %>%
+  mutate(
+  Category = case_when(
+             AverageSteps < 5000 ~ "Sedentary",
+             AverageSteps < 7500 ~ "Lightly active",
+             AverageSteps < 10000 ~ "Moderately active",
+             AverageSteps < 12500 ~ "Active",
+             TRUE ~ "Extremely active"
+         )
+     )
+```
+
+```{r}
+#Counting and adding percentages
+StepsCategories <- AverageSteps %>%
+          count(Category) %>%
+          arrange(desc(n)) %>%
+          mutate(
+                  Percentage = n / sum(n)*100,
+                  Accum = cumsum(Percentage),
+                  Label = Category)
+```
+
+This graphic shows how the participants are distributed in every activity category, and an accumulated percentage to get to see WHO ARE the main users, inspired by a Pareto Diagram.
+
+```{r warning=FALSE, results='hide'}
+
+Roof <- 10 # Graphic max value
+
+ggplot(StepsCategories, aes(x = reorder(Category, -n), y = n)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  geom_line(aes(y = Accum * Roof/100, group = 1), color = "green", size = 1) +
+  geom_point(aes(y = Accum * Roof/100), color = "green", size = 2) +
+
+  geom_text(aes(y = Accum * Roof/100, label = percent(Accum/100, accuracy = 1)),
+            vjust = 2.5, color = "green", size = 3.5) +
+  scale_y_continuous(
+    limits = c(0, Roof),
+    breaks = seq(0, Roof, by = 2),
+    sec.axis = sec_axis(~ . / Roof, 
+                        name = "Accumulated percentage", 
+                        labels = percent,
+                        breaks = seq(0, 1, by = 0.2))
+  ) +
+  labs(
+    title = "Activity Category",
+    x = "",
+    y = "Participants"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+<br>
+From the graphic:
+We can see 77% of the users land in Sedentary, Lightly Active, and Moderately Active.
+
+<br>
+
+#### 5.2 Weight information:
+
+Lets check how many Participants shared their weight information:
+```{r}
+n_distinct(WeightClean$Id)
+```
+
+Although this amount of participants will not constitute a significant sample, it will be processed to establish a method that works for this, and for larger dataframes.
+
+The weight by itself does not give enough information to estimate a person´s health, because this also depends on the height. That is when the Body mass index (BMI) comes in, as a value that correlates height and weight through this equation:
+
+$$
+BMI = \frac{\text{weight (kg)}}{(\text{height (m)})^2}.
+$$
+
+According to the [U.S. Centers for Disease Control and Prevention](https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html), there are 4 major categories for BMI in adults:
+
+* Less than 18.5 -> Underweight 
+* 18.5 to less than 25 -> Healthy Weight 
+* 25 to less than 30 -> Overweight
+* 30 or greater -> Obesity 
+
+Applied to our case, the distribution is:
+
+```{r}
+#Group by Average BMI
+AverageBMI <- WeightClean %>% 
+     group_by(Id) %>%
+     summarise(AverageBMI = mean(BMI))
+```
+
+```{r}
+#Add categories
+AverageBMI <- AverageBMI %>%
+     mutate(
+         Category = case_when(
+             AverageBMI < 18.5 ~ "Underweight",
+             AverageBMI < 25 ~ "Healthy weight",
+             AverageBMI < 30 ~ "Overweight",
+             TRUE ~ "Obesity"
+          )
+      )
+```
+
+```{r}
+PieChartBMI <- AverageBMI %>%
+    group_by(Category) %>%
+    summarise(Id = n()) %>%
+    mutate(Percentage = Id / sum(Id))
+```
+
+```{r}
+colores <- c("Healthy weight" = "lightgreen",   
+             "Obesity"        = "#EC7063",   
+             "Overweight"     = "#F9E79F")   #Colors for the PieChart
+
+ggplot(PieChartBMI, aes(x = "", y = Percentage, fill = Category)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y") +
+  geom_text(aes(label = percent(Percentage)),
+            position = position_stack(vjust = 0.5), size = 4) +
+  labs(title = "Groups of BMI") +
+  theme_void() +
+  scale_fill_manual(values = colores)
+```
+<br>
+
+#### 5.3 Device Use
+
+* How was the tracking device used during these two months?
+
+```{r}
+  
+  UsersOverTime <- DailyActivityClean %>%
+    mutate(ActivityDate = as.Date(ActivityDate, format = "%m/%d/%Y")) %>%
+    group_by(ActivityDate) %>%
+    summarise(Users = n_distinct(dplyr::pick(contains("id"))[[1]]))
+
+p <- ggplot(UsersOverTime, aes(x = ActivityDate, y = Users)) +
+  geom_point(color = "darkblue", size = 1) +
+  labs(
+    title = "Interactive: Users each day",
+    x = "Date",
+    y = "Number of users"
+  ) +
+  scale_x_date(date_breaks = "1 week", date_labels = "%d-%b") +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  
+ggplotly(p) # Make it interactive
+```
+
+From the graph:
+During March, the maximum number of users per day was 9. From April the first, the number of users jump to 29 and stays around that amount, showing no special preference for some dates, or days of the week.  During the first days of May, the number of users starts to go down.
+
+<br>
+  
+* For how long is a tracking device used each day?
+
+From the graph: It is found that the participants wear their devices between 14.8 and 24 hours a day.
+
+```{r warning=FALSE}
+
+DeviceUse <- DailyActivityClean %>%
+  group_by(Id) %>%
+  summarise(AverageHours = mean(Totaltime)/60) %>%
+  arrange(AverageHours) %>%
+  mutate(Order = row_number())
+
+p <- ggplot(DeviceUse, aes(x = Order, y = AverageHours)) +
+  geom_point(color = "darkgreen", size = 3) +
+  geom_segment(aes(x=Order, xend=Order, y=min(DeviceUse$AverageHours), yend=AverageHours), color="grey") +
+  labs(
+    title = "Interactive: Average Device usage",
+    x = "Participants",
+    y = "Average hours/day"
+  ) +
+  scale_y_continuous(
+    limits = c(min(DeviceUse$AverageHours), max(DeviceUse$AverageHours)),  
+    breaks = seq(14, 24, by = 1) 
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+
+ggplotly(p) #Make it interactive
+
+```
+
+
+#### 5.4 Sleep Time
+
+According to the Sleep Foundation in the article [How Much Sleep Do You Need?](https://www.sleepfoundation.org/how-sleep-works/how-much-sleep-do-we-really-need), an adult need at least 7 hours of sleep.
+
+From the graph: it twas found that among the 25 people with sleeping information, only 7 sleep on average more than 7 hours a day.
+
+```{r}
+SleepPerId <- DailySleep %>%
+  group_by(Id)%>%
+  summarise(TotalHours = mean(TotalMinutesAsleep, ) / 60)%>%
+  arrange(TotalHours)
+```
+
+```{r}
+SleepPerId %>%
+  mutate(Category = ifelse(TotalHours > 7, "> 7 hours", "≤ 7 hours")) %>%
+  count(Category) %>%
+  mutate(Category = factor(Category, levels = c("≤ 7 hours", "> 7 hours"))) %>% #Alter the Order in the viz
+  ggplot(aes(x = Category, y = n, fill = Category)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = n), vjust = 1.5, color = "white", size = 5) + 
+  labs(
+    title = "Users per sleeping hours",
+    x = "",
+    y = "Number of users"
+  ) +
+  theme_minimal()
+```
+
+* Is there a relationship between the Average Steps taken and the Average Sleeping hours ?
+
+```{r}
+StepSleep <- inner_join(AverageSteps,SleepPerId,by="Id")
+
+p<-ggplot(StepSleep, aes(x = AverageSteps, y = TotalHours)) +
+    geom_point(aes(color = Category), size = 3) +  
+    geom_vline(xintercept = seq(5000, 12500, by = 2500),linetype ="dashed", color = "lightgray") +
+    labs(
+       title = paste(
+      "Interactive: Steps taken Vs Sleeping hours",
+      "\nPearson Correlation:", round(cor(StepSleep$AverageSteps, StepSleep$TotalHours), 2) #Had to leave it here, ggplotly does not support subtitle
+    ),
+    x = "Average Steps",
+    y = "Sleeping Hours"
+  ) +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())+
+   scale_x_continuous(
+    breaks = seq(0, max(StepSleep$AverageSteps, na.rm = TRUE), by = 2500)
+   )
+ggplotly(p)
+```
+
+From the Viz, I can tell there is no obvious relationship between these two variables. 
+This is confirmed using the Pearson Correlation which results in -0.12, indicating a week negative relationship. With a value this close to zero, the line of best fit is not helpful in describing the data.
+
+
+### 6. Results summary
+
+Although the sample size is small and demographic information —critical for BellaBeat’s product strategy— was missing, it was still possible to outline a profile of health-tracking device users:
+
+* The Sedentary, Lightly Active, or Moderately Active users are 77% of the sample. Adding Active users, it goes up to 94%. Showing the majority of them are people who know they need to control their activity, and you can not change what you don´t measure! 
+
+* It was found that 31% of the participants have a healthy weight, 54% are overweight, and 15% are obese. So 69% of the sample needs to control their weight.
+
+* Most of the users wear their health tracking device everyday, during a month, and then the usage starts to go down. This shows for how long people stay motivated and when they need support for staying engaged
+
+* Participants wear their devices between 14.8 and 24 hours a day. People need a device that can be worn in every occasion with a timeless design, that last all day and night without frequent charging.
+
+* Among the 25 people with sleeping information, only 7 sleep on average more than 7 hours a day. This means that 72% of the sample is not spleeping enough. Sleep coaching is key.
+
+* There is no relationship between how many steps a person takes on average and the amount of sleep they get
+
+
+### 7. Recommendations
+
+The product I that I am focusing in the Bellabeat App. Right now it is described to provide users with health data related to their activity, sleep, stress,
+menstrual cycle, and mindfulness habits.
+
+It is necessary to enhance:
+
+* Weight: Since 69% of users are overweight or obese, Bellabeat needs to include weight management as an optional feature (e.g., activity reminders, progress dashboards, motivational nudges).
+
+* Activity: Integrate personalized activity goals to encourage sedentary, lightly and moderately active users to gradually move towards higher activity levels.
+
+* Device use: Usage drops after the first month: consider gamification, progress milestones, reward systems, in-app challenges or community features to increase accountability and motivation.
+
+* Sleep: Highlight sleep coaching features and actionable insights (bedtime reminders, relaxation tips) since users often lack awareness of poor sleep habits.
+
+
+
