@@ -1,3 +1,0 @@
-"0","AverageSteps <- DailyActivityClean %>%"
-"0","     group_by(Id) %>%"
-"0","     summarise(AverageSteps = mean(TotalSteps))"

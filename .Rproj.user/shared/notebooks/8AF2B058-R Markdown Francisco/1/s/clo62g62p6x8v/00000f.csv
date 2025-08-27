@@ -1,6 +1,0 @@
-"0",""
-"0","MinuteSleep$DateTime <- mdy_hms(MinuteSleep$date)"
-"0","MinuteSleep$Date <- as.Date(MinuteSleep$DateTime)"
-"0","MinuteSleep$Time <- format(MinuteSleep$DateTime, ""%H:%M:%S"")"
-"0","MinuteSleep$date <- NULL"
-"0",""

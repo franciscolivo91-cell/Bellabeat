@@ -1,4 +1,0 @@
-"0","PieChartBMI <- AverageBMI %>%"
-"0","    group_by(Category) %>%"
-"0","    summarise(Id = n()) %>%"
-"0","    mutate(Percentage = Id / sum(Id))"

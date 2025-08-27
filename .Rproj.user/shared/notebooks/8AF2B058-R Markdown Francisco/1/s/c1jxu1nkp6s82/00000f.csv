@@ -1,7 +1,0 @@
-"0","StepsCategories <- AverageSteps %>%"
-"0","          count(Category) %>%"
-"0","          arrange(desc(n)) %>%"
-"0","          mutate("
-"0","                  Percentage = n / sum(n)*100,"
-"0","                  Accum = cumsum(Percentage),"
-"0","                  Label = Category)"

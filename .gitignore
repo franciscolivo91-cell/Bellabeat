@@ -1,0 +1,29 @@
+# Archivos de historial de R
+.Rhistory
+.Rapp.history
+
+# Datos guardados en el entorno de R
+.RData
+.Ruserdata
+
+# Carpetas de caché
+.Rproj.user
+.Rproj.user
+
+# Archivos de proyectos de RStudio
+.Rproj
+
+# Archivos temporales de R
+.Rout
+.Rout.save
+.Rout.fail
+
+# Archivos de salida o logs
+.out
+.log
+.aux
+.toc
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
